@@ -8,7 +8,7 @@ export class Github {
 		this.token = token;
 	}
 
-	async pullRequestID(owner: string, name: string, sha: string): Promise<string> {
+	async pullRequestID(owner: string, name: string, sha: string): Promise<string | undefined> {
 		const query = this.query(owner, name, sha);
 		const response = await this.api(query);
 

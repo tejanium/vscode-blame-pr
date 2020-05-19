@@ -88,44 +88,44 @@ suite('Test command blame-pr.open', () => {
 	});
 
 	test('Not yet committed', async () => {
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		mockGit({ sha: '0000000000000000000000000000000000000000' });
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Not Committed Yet'), {});
+		sandbox.assert.calledWith(warningStub, 'Not Committed Yet');
 	});
 
 	test('Cannot get Git info', async () => {
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		mockGit({ config: '' });
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Could not get Git info, please try a little later'), {});
+		sandbox.assert.calledWith(warningStub, 'Could not get Git info, please try a little later');
 	});
 
 	test('Git blame respond with code 1', async () => {
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		mockSpawn.setStrategy(() => { return mockSpawn.simple(1); });
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Git has no remote info'), {});
+		sandbox.assert.calledWith(warningStub, 'Git has no remote info');
 	});
 
 	test('No Github personal token setup', async () => {
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		mockValidGit();
 		configureGithubToken(sandbox, '');
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Github personal access token is missing'), {});
+		sandbox.assert.calledWith(warningStub, 'Github personal access token is missing');
 	});
 
 	test('Getting data from github', async () => {
@@ -155,7 +155,7 @@ suite('Test command blame-pr.open', () => {
 	test('Getting no associated PR data from github', async () => {
 		mockValidGit(); configureGithubToken(sandbox, 'token');
 
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		nockGithubResponse(200, {
 			"commit": null
@@ -163,13 +163,13 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('sha1234 has no associated PR'), {});
+		sandbox.assert.calledWith(warningStub, 'sha1234 has no associated PR', 'Open commit URL');
 	});
 
 	test('Getting empty associated PR data from github', async () => {
 		mockValidGit(); configureGithubToken(sandbox, 'token');
 
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		nockGithubResponse(200, {
 			"commit": {
@@ -181,30 +181,30 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('sha1234 has no associated PR'), {});
+		sandbox.assert.calledWith(warningStub, 'sha1234 has no associated PR', 'Open commit URL');
 	});
 
 	test('Getting no data from github', async () => {
 		mockValidGit(); configureGithubToken(sandbox, 'token');
 
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		nockGithubResponse(200, null);
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('sha1234 has no associated PR'), {});
+		sandbox.assert.calledWith(warningStub, 'sha1234 has no associated PR', 'Open commit URL');
 	});
 
 	test('Getting 500 from github', async () => {
 		mockValidGit(); configureGithubToken(sandbox, 'token');
 
-		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage');
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
 		nockGithubResponse(500, null);
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Cannot contact Github'), {});
+		sandbox.assert.calledWith(warningStub, 'Cannot contact Github');
 	});
 });

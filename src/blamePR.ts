@@ -17,7 +17,7 @@ export class BlamePR {
 		this.github = new Github(githubToken);
 	}
 
-	async info(): Promise<{ domain: string, owner: string, name: string, sha: string, PRId: string }> {
+	async info(): Promise<{ domain: string, owner: string, name: string, sha: string, PRId: string | undefined }> {
 		const { domain, owner, name } = await this.git.config();
 		const { sha, commitMessage } = await this.git.blame(this.fileName, this.lineNumber);
 
@@ -30,7 +30,7 @@ export class BlamePR {
 		return commitMessage?.match(/\#[0-9]+/g)?.pop()?.replace('#', '');
 	}
 
-	private async remoteID(owner: string, name: string, sha: string): Promise<string> {
+	private async remoteID(owner: string, name: string, sha: string): Promise<string | undefined> {
 		return this.github.pullRequestID(owner, name, sha);
 	}
 }
