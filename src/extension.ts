@@ -13,11 +13,17 @@ export function activate(context: vscode.ExtensionContext) {
 			const blamePR = new BlamePR(fileName, lineNumber, githubToken);
 
 			try {
-				const pullRequestURL = await blamePR.url();
+				const { domain, owner, name, sha, PRId } = await blamePR.info();
 
-				vscode.env.openExternal(vscode.Uri.parse(pullRequestURL));
+				if (PRId) {
+					const url = `https://${domain}/${owner}/${name}/pull/${PRId}`;
+
+					vscode.env.openExternal(vscode.Uri.parse(url));
+				} else {
+					vscode.window.showWarningMessage(`${sha.substr(0, 7)} has no associated PR`, {});
+				}
 			} catch (error) {
-				vscode.window.showWarningMessage(error.toString(), {});
+				vscode.window.showWarningMessage(error.message, {});
 			}
 		}
 	});

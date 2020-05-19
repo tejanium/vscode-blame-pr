@@ -32,7 +32,7 @@
 			"outFiles": [
 				"${workspaceFolder}/out/test/**/*.js"
 			],
-			"preLaunchTask": "yarn: test-compile"
+			"preLaunchTask": "npm: test-compile"
 		}
 	]
 }

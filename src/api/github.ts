@@ -25,7 +25,7 @@ export class Github {
 
 			return request;
 		} catch (error) {
-			throw Error('cannot contact Github');
+			throw Error('Cannot contact Github');
 		}
 	}
 

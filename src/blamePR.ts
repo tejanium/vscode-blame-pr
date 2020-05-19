@@ -17,17 +17,13 @@ export class BlamePR {
 		this.github = new Github(githubToken);
 	}
 
-	async url(): Promise<string> {
+	async info(): Promise<{ domain: string, owner: string, name: string, sha: string, PRId: string }> {
 		const { domain, owner, name } = await this.git.config();
 		const { sha, commitMessage } = await this.git.blame(this.fileName, this.lineNumber);
 
-		const id = this.localID(commitMessage) || await this.remoteID(owner, name, sha);
+		const PRId = this.localID(commitMessage) || await this.remoteID(owner, name, sha);
 
-		if (!id) {
-			throw Error(`${sha.substr(0, 7)} has no associated PR`);
-		}
-
-		return `https://${domain}/${owner}/${name}/pull/${id}`;
+		return { domain, owner, name, sha, PRId };
 	}
 
 	private localID(commitMessage: string): string | undefined {

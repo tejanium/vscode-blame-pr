@@ -94,7 +94,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: Not Committed Yet'), {});
+		sandbox.assert.calledWith(warningStub, ('Not Committed Yet'), {});
 	});
 
 	test('Cannot get Git info', async () => {
@@ -104,7 +104,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: Could not get Git info, please try a little later'), {});
+		sandbox.assert.calledWith(warningStub, ('Could not get Git info, please try a little later'), {});
 	});
 
 	test('Git blame respond with code 1', async () => {
@@ -114,7 +114,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: Git has no remote info'), {});
+		sandbox.assert.calledWith(warningStub, ('Git has no remote info'), {});
 	});
 
 	test('No Github personal token setup', async () => {
@@ -125,7 +125,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: Github personal access token is missing'), {});
+		sandbox.assert.calledWith(warningStub, ('Github personal access token is missing'), {});
 	});
 
 	test('Getting data from github', async () => {
@@ -163,7 +163,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: sha1234 has no associated PR'), {});
+		sandbox.assert.calledWith(warningStub, ('sha1234 has no associated PR'), {});
 	});
 
 	test('Getting empty associated PR data from github', async () => {
@@ -181,7 +181,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: sha1234 has no associated PR'), {});
+		sandbox.assert.calledWith(warningStub, ('sha1234 has no associated PR'), {});
 	});
 
 	test('Getting no data from github', async () => {
@@ -193,7 +193,7 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: sha1234 has no associated PR'), {});
+		sandbox.assert.calledWith(warningStub, ('sha1234 has no associated PR'), {});
 	});
 
 	test('Getting 500 from github', async () => {
@@ -205,6 +205,6 @@ suite('Test command blame-pr.open', () => {
 
 		await vscode.commands.executeCommand('blame-pr.open');
 
-		sandbox.assert.calledWith(warningStub, ('Error: cannot contact Github'), {});
+		sandbox.assert.calledWith(warningStub, ('Cannot contact Github'), {});
 	});
 });
