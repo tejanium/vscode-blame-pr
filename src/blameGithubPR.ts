@@ -2,7 +2,7 @@ import { Git } from './api/git';
 import { Github } from './api/github';
 import { dirname } from 'path';
 
-export class BlamePR {
+export class BlameGithubPR {
 	private fileName: string;
 	private lineNumber: number;
 
@@ -17,24 +17,20 @@ export class BlamePR {
 		this.github = new Github(githubToken);
 	}
 
-	async url(): Promise<string> {
+	async info(): Promise<{ domain: string, owner: string, name: string, sha: string, PRId: string | undefined }> {
 		const { domain, owner, name } = await this.git.config();
 		const { sha, commitMessage } = await this.git.blame(this.fileName, this.lineNumber);
 
-		const id = this.localID(commitMessage) || await this.remoteID(owner, name, sha);
+		const PRId = this.localID(commitMessage) || await this.remoteID(owner, name, sha);
 
-		if (!id) {
-			throw Error(`${sha.substr(0, 7)} has no associated PR`);
-		}
-
-		return `https://${domain}/${owner}/${name}/pull/${id}`;
+		return { domain, owner, name, sha, PRId };
 	}
 
 	private localID(commitMessage: string): string | undefined {
 		return commitMessage?.match(/\#[0-9]+/g)?.pop()?.replace('#', '');
 	}
 
-	private async remoteID(owner: string, name: string, sha: string): Promise<string> {
+	private async remoteID(owner: string, name: string, sha: string): Promise<string | undefined> {
 		return this.github.pullRequestID(owner, name, sha);
 	}
 }
