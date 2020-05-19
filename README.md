@@ -16,7 +16,3 @@ Preview:
 
 * `blame-pr.githubToken`: Github personal access token with scope to repo.
   <img src='https://raw.githubusercontent.com/tejanium/vscode-blame-pr/master/img/token.png' width='50%'>
-
-### 1.0.0
-
-Initial release
