@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { BlamePR } from './blamePR';
+import { BlameGithubPR } from './blameGithubPR';
 
 export function activate(context: vscode.ExtensionContext) {
 	let viewGithubPR = vscode.commands.registerCommand('blame-pr.open', async () => {
@@ -10,10 +10,10 @@ export function activate(context: vscode.ExtensionContext) {
 			const lineNumber = editor.selection.active.line + 1;
 			const githubToken = vscode.workspace.getConfiguration('blame-pr').get('githubToken');
 
-			const blamePR = new BlamePR(fileName, lineNumber, githubToken);
+			const blameGithubPR = new BlameGithubPR(fileName, lineNumber, githubToken);
 
 			try {
-				const { domain, owner, name, sha, PRId } = await blamePR.info();
+				const { domain, owner, name, sha, PRId } = await blameGithubPR.info();
 
 				openBrowser(domain, owner, name, sha, PRId);
 			} catch (error) {

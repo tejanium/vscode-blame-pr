@@ -2,7 +2,7 @@ import { Git } from './api/git';
 import { Github } from './api/github';
 import { dirname } from 'path';
 
-export class BlamePR {
+export class BlameGithubPR {
 	private fileName: string;
 	private lineNumber: number;
 
