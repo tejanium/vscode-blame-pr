@@ -1,7 +1,7 @@
 {
 	"publisher": "tejanium",
 	"name": "blame-pr",
-	"displayName": "Blame PR",
+	"displayName": "Blame Github's Pull Request",
 	"icon": "img/ico.png",
 	"description": "Blame and open Github's associated PR.",
 	"version": "1.0.0",
@@ -32,7 +32,7 @@
 			}
 		],
 		"configuration": {
-			"title": "Blame PR",
+			"title": "Blame Github's PR",
 			"properties": {
 				"blame-pr.githubToken": {
 					"type": "string",
