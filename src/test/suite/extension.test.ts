@@ -207,4 +207,26 @@ suite('Test command blame-pr.open', () => {
 
 		sandbox.assert.calledWith(warningStub, 'Cannot contact Github');
 	});
+
+	test('Open commit URL', async () => {
+		mockValidGit(); configureGithubToken(sandbox, 'token'); nockGithubResponse(200, null);
+
+		const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
+		const openExternalStub = sandbox.stub(vscode.env, 'openExternal');
+
+		warningStub.resolves('Open commit URL');
+		await vscode.commands.executeCommand('blame-pr.open');
+
+		sandbox.assert.calledWith(openExternalStub, vscode.Uri.parse('https://github.com/owner/name/commit/sha1234567890'));
+	});
+
+	test('Not Open commit URL', async () => {
+		mockValidGit(); configureGithubToken(sandbox, 'token'); nockGithubResponse(200, null);
+
+		const openExternalStub = sandbox.stub(vscode.env, 'openExternal');
+
+		await vscode.commands.executeCommand('blame-pr.open');
+
+		sandbox.assert.notCalled(openExternalStub);
+	});
 });
