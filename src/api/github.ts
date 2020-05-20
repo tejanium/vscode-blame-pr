@@ -2,11 +2,7 @@ import { graphql } from '@octokit/graphql';
 import { GraphQlQueryResponseData } from '@octokit/graphql/dist-types/types';
 
 export class Github {
-	private token: string | unknown;
-
-	constructor(token: string | unknown) {
-		this.token = token;
-	}
+	constructor(private token: string | unknown) { }
 
 	async pullRequestID(owner: string, name: string, sha: string): Promise<string | undefined> {
 		const query = this.query(owner, name, sha);

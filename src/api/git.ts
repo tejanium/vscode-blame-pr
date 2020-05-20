@@ -1,11 +1,7 @@
 const spawn = require('await-spawn');
 
 export class Git {
-	private cwd: string;
-
-	constructor(cwd: string) {
-		this.cwd = cwd;
-	}
+	constructor(private cwd: string) { }
 
 	async config(): Promise<{ domain: string, owner: string, name: string }> {
 		const args = ['config', '--get', 'remote.origin.url'];
@@ -24,7 +20,7 @@ export class Git {
 
 	}
 
-	async blame(fileName: string, lineNumber: number): Promise<{ sha: string, commitMessage: string }> {
+	async blame(fileName: string, lineNumber: number): Promise<{ sha: string, author: string, commitMessage: string }> {
 		const args = ['blame', '-p', fileName, '-L', `${lineNumber},${lineNumber}`];
 		const blame = await this.git(args);
 
@@ -57,15 +53,16 @@ export class Git {
 		return { domain, owner, name };
 	}
 
-	private parseBlame(output: string): { sha: string, commitMessage: string } {
+	private parseBlame(output: string): { sha: string, author: string, commitMessage: string } {
 		const gitOutput = output.split('\n');
 		const sha = gitOutput[0].split(' ')[0];
-		const commitMessage = gitOutput[9];
+		const author = gitOutput[1].replace('author ', '');
+		const commitMessage = gitOutput[9].replace('summary ', '');
 
 		if (sha === '0000000000000000000000000000000000000000') {
 			throw Error('Not Committed Yet');
 		}
 
-		return { sha, commitMessage };
+		return { sha, author, commitMessage };
 	}
 }
