@@ -1,10 +1,17 @@
 # Change Log
 
+## v1.0.2
+
+### Added
+
+- New command: `blame-pr.toggleStatusbar` displays Git blame info in the status bar
+- Cache Git and Github info
+
 ## v1.0.1
 
 ### Added
 
-- Open commit when PR is not available
+- Propmpt to open commit URL when PR is not available
 
 ### Changed
 

@@ -12,6 +12,8 @@ Preview:
 
 <img src='https://raw.githubusercontent.com/tejanium/vscode-blame-pr/master/img/preview.gif'>
 
+To display the blame info in the status bar, open the Command Palette and type `blame-pr.toggleStatusbar`, click to activate `blame-pr.open`.
+
 ## Extension Settings
 
 * `blame-pr.githubToken`: Github personal access token with scope to repo.
