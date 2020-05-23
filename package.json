@@ -21,7 +21,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:blame-pr.open"
+		"onCommand:blame-pr.open",
+		"onCommand:blame-pr.toggleStatusbar"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -29,6 +30,10 @@
 			{
 				"command": "blame-pr.open",
 				"title": "Blame PR: Open in Github"
+			},
+			{
+				"command": "blame-pr.toggleStatusbar",
+				"title": "Blame PR: Toggle Status Bar"
 			}
 		],
 		"configuration": {
@@ -77,6 +82,7 @@
 	},
 	"dependencies": {
 		"@octokit/graphql": "^4.4.0",
-		"await-spawn": "^3.0.0"
+		"await-spawn": "^3.0.0",
+		"vscode-cache": "^0.3.0"
 	}
 }

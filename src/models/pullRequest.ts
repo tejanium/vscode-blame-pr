@@ -1,19 +1,22 @@
-import { Git } from './api/git';
-import { Github } from './api/github';
+import * as vscode from 'vscode';
+import { Git } from '../api/git';
+import { Github } from '../api/github';
 import { dirname } from 'path';
 
-export class BlameGithubPR {
+export class PullRequest {
 	private fileName: string;
 	private lineNumber: number;
 
 	private git: Git;
 	private github: Github;
 
-	constructor(fileName: string, lineNumber: number, githubToken: string | unknown) {
-		this.fileName = fileName;
-		this.lineNumber = lineNumber;
+	constructor(editor: vscode.TextEditor) {
+		const githubToken = vscode.workspace.getConfiguration('blame-pr').get('githubToken');
 
-		this.git = new Git(dirname(fileName));
+		this.fileName = editor.document.fileName;
+		this.lineNumber = editor.selection.active.line + 1;
+
+		this.git = new Git(dirname(this.fileName));
 		this.github = new Github(githubToken);
 	}
 

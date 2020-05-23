@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as sinon from 'sinon';
 import { afterEach, beforeEach } from 'mocha';
 import nock = require('nock');
+import assert = require('assert');
+import { MockStatusBarItem } from '../mocks/statusBar';
 
 const mockSpawn = require('mock-spawn')();
 require('child_process').spawn = mockSpawn;
@@ -9,8 +11,14 @@ require('child_process').spawn = mockSpawn;
 function mockGit({
 	config = 'git@github.com:owner/name.git',
 	sha = 'sha1234567890',
-	commitMessage = 'message'
-}: { config?: string; sha?: string; commitMessage?: string; }): void {
+	commitMessage = 'message',
+	userName = 'name'
+}: {
+	config?: string;
+	sha?: string;
+	commitMessage?: string;
+	userName?: string;
+}): void {
 	mockSpawn.setStrategy(function (command: string, args: Array<string>) {
 		const fileName = vscode.window.activeTextEditor?.document.fileName;
 
@@ -19,7 +27,7 @@ function mockGit({
 		}
 
 		if (args.join(',') === ['blame', '-p', fileName, '-L', `1,1`].join(',')) {
-			const blame = `${sha} 1 1 1\n\n\n\n\n\n\n\n\n${commitMessage}\n\n`;
+			const blame = `${sha} 1 1 1\n${userName}\n\n\n\n\n\n\n\n${commitMessage}\n\n`;
 
 			return mockSpawn.simple(0, blame);
 		}
@@ -46,10 +54,50 @@ function nockGithubResponse(status: number, response: Object | null): void {
 		});
 }
 
-suite('Test command blame-pr.open', () => {
+function sleep(ms: number) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
+suite('Test command: blame-pr.open', () => {
 	let sandbox: sinon.SinonSandbox;
 
-	beforeEach(async () => {
+	beforeEach(() => {
+		sandbox = sinon.createSandbox();
+	});
+
+	afterEach(() => {
+		sandbox.restore();
+	});
+
+	test('Toggle blame info in status bar', async () => {
+		const mockStatusBarItem = new MockStatusBarItem;
+		sandbox.stub(vscode.window, 'createStatusBarItem').returns(mockStatusBarItem);
+
+		const showSpy = sandbox.stub(mockStatusBarItem, 'show');
+		const hideSpy = sandbox.stub(mockStatusBarItem, 'hide');
+
+		mockGit({ userName: 'User Name', commitMessage: 'Commit message (#1)' });
+
+		await vscode.commands.executeCommand('blame-pr.toggleStatusbar');
+		sandbox.assert.calledOnce(hideSpy);
+		assert.equal(mockStatusBarItem.text, '$(git-pull-request) $(tree-item-loading~spin)');
+
+		await sleep(50);
+
+		sandbox.assert.called(showSpy);
+		assert.equal(mockStatusBarItem.text, '$(git-pull-request) User Name: "Commit message (#1)"');
+
+		await vscode.commands.executeCommand('blame-pr.toggleStatusbar');
+		sandbox.assert.calledTwice(hideSpy);
+	});
+});
+
+suite('Test command: blame-pr.open', () => {
+	let sandbox: sinon.SinonSandbox;
+
+	beforeEach(() => {
 		sandbox = sinon.createSandbox();
 	});
 
