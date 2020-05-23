@@ -25,14 +25,18 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"${workspaceFolder}/src/test/fixtures/file.txt",
-				"-—disable-extensions",
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/test/**/*.js"
 			],
-			"preLaunchTask": "npm: test-compile"
+			"preLaunchTask": "npm: pretest",
+			"env": {
+				"LOADING_TIMEOUT": "10",
+				"CACHE_EXPIRATION": "-99"
+			}
 		}
 	]
 }

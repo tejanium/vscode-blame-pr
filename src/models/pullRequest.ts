@@ -1,23 +1,23 @@
 import * as vscode from 'vscode';
-import { Git } from '../api/git';
-import { Github } from '../api/github';
 import { dirname } from 'path';
+import { CachedGit } from './cachedGit';
+import { CachedGithub } from './cachedGithub';
 
 export class PullRequest {
 	private fileName: string;
 	private lineNumber: number;
 
-	private git: Git;
-	private github: Github;
+	private git: CachedGit;
+	private github: CachedGithub;
 
-	constructor(editor: vscode.TextEditor) {
+	constructor(editor: vscode.TextEditor, private cache: any) {
 		const githubToken = vscode.workspace.getConfiguration('blame-pr').get('githubToken');
 
 		this.fileName = editor.document.fileName;
 		this.lineNumber = editor.selection.active.line + 1;
 
-		this.git = new Git(dirname(this.fileName));
-		this.github = new Github(githubToken);
+		this.git = new CachedGit(this.cache, dirname(this.fileName));
+		this.github = new CachedGithub(this.cache, githubToken);
 	}
 
 	async info(): Promise<{ domain: string, owner: string, name: string, sha: string, PRId: string | undefined }> {

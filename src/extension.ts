@@ -4,11 +4,12 @@ import { StatusBarController } from './controllers/statusBar';
 
 const Cache = require('vscode-cache');
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	const cache = new Cache(context);
+	await cache.flush();
 
 	context.subscriptions.push(
-		new OpenController(),
+		new OpenController(cache),
 		new StatusBarController(cache)
 	);
 }

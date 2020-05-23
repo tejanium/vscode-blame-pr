@@ -4,7 +4,7 @@ import { PullRequest } from '../models/pullRequest';
 export class OpenController {
 	private disposable: vscode.Disposable;
 
-	constructor() {
+	constructor(private cache: any) {
 		this.disposable = vscode.commands.registerCommand('blame-pr.open', this.openHandler.bind(this));
 	}
 
@@ -16,7 +16,7 @@ export class OpenController {
 		const editor = vscode.window.activeTextEditor;
 
 		if (editor) {
-			const pullRequest = new PullRequest(editor);
+			const pullRequest = new PullRequest(editor, this.cache);
 
 			try {
 				const { domain, owner, name, sha, PRId } = await pullRequest.info();
