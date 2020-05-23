@@ -55,7 +55,7 @@
 		"webpack": "webpack --mode development",
 		"webpack-dev": "webpack --mode development --watch",
 		"pretest": "yarn compile && yarn test-compile && yarn lint",
-		"test": "LOADING_TIMEOUT=10 CACHE_EXPIRATION=-99 node ./out/test/runTest.js",
+		"test": "npm run env LOADING_TIMEOUT=10 CACHE_EXPIRATION=-99 -- node ./out/test/runTest.js",
 		"test-compile": "tsc -p ./",
 		"deploy": "vsce publish --yarn"
 	},
