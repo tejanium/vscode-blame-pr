@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
-import { Git } from '../api/git';
 import { dirname } from 'path';
+import { CachedGit } from '../models/cachedGit';
 
-const CACHE_EXPIRATION = 30; // s
-const LOADING_TIMEOUT = 50; // ms
+const LOADING_TIMEOUT = parseInt(process.env.LOADING_TIMEOUT as string) || 50; // ms
 
 export class StatusBarController {
 	private disposable: vscode.Disposable;
@@ -58,20 +57,18 @@ export class StatusBarController {
 	}
 
 	private async update(): Promise<void> {
-		if (this.enabled) 	{
+		if (this.enabled) {
 			if (this.currentCursor !== this.cursor) {
-				this.loading();
-			} else {
-				this.currentCursor = this.cursor;
+				this.write('$(tree-item-loading~spin)');
+
+				this.delayUpdate();
 			}
 		} else {
 			this.reset();
 		}
 	}
 
-	private loading(): void {
-		this.write('$(tree-item-loading~spin)');
-
+	private delayUpdate(): void {
 		clearTimeout(this.timer);
 		this.timer = setTimeout(() => {
 			this.updateStatusbar();
@@ -80,16 +77,13 @@ export class StatusBarController {
 
 	private async updateStatusbar(): Promise<void> {
 		if (this.fileName && this.lineNumber) {
-			const git = new Git(dirname(this.fileName));
+			const git = new CachedGit(this.cache, dirname(this.fileName));
 
 			try {
-				const data = this.cache.get(this.cursor) || await git.blame(this.fileName, this.lineNumber);
+				const { author, commitMessage } = await git.blame(this.fileName, this.lineNumber);
 
-				if (!this.cache.has(this.cursor)) {
-					this.cache.put(this.cursor, data, CACHE_EXPIRATION);
-				}
-
-				this.write(`${data.author}: "${data.commitMessage}"`);
+				this.currentCursor = this.cursor;
+				this.write(`${author}: "${commitMessage}"`);
 				this.statusBar.show();
 			} catch {
 				this.statusBar.hide();
