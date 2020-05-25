@@ -33,15 +33,15 @@ steps:
     path: $(YARN_CACHE_FOLDER)
   displayName: Cache Yarn packages
 
-- bash: curl https://update.code.visualstudio.com/api/update/darwin/stable/latest > vscode-latest
+- bash: curl https://update.code.visualstudio.com/api/update/darwin/stable/latest | grep -oE '"name":"([0-9\.]+)"' > vscode-latest
   displayName: Check vscode-latest darwin
   condition: eq(variables['Agent.OS'], 'Darwin')
 
-- bash: curl https://update.code.visualstudio.com/api/update/win32-x64/stable/latest > vscode-latest
+- bash: curl https://update.code.visualstudio.com/api/update/win32-x64/stable/latest | grep -oE '"name":"([0-9\.]+)"' > vscode-latest
   displayName: Check vscode-latest windows
   condition: eq(variables['Agent.OS'], 'Windows_NT')
 
-- bash: curl https://update.code.visualstudio.com/api/update/linux-x64/stable/latest > vscode-latest
+- bash: curl https://update.code.visualstudio.com/api/update/linux-x64/stable/latest | grep -oE '"name":"([0-9\.]+)"' > vscode-latest
   displayName: Check vscode-latest linux
   condition: eq(variables['Agent.OS'], 'Linux')
 
