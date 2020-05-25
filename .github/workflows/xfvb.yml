@@ -1,3 +1,4 @@
+name: XFVB
 on:
   push:
     branches:
