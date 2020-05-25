@@ -93,7 +93,7 @@ suite('Test commands', () => {
 
 			await vscode.commands.executeCommand('blame-pr.open');
 
-			sandbox.assert.calledWith(openExternalStub, vscode.Uri.parse('https://github.com/owner/name/pull/1'));
+			sandbox.assert.calledWith(openExternalStub, vscode.Uri.parse('https://github.com/owner/name/pull/10'));
 		});
 
 		test('Duplicate PR ID, usually revert', async () => {
