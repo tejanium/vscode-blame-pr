@@ -6,9 +6,9 @@ export class Github {
 
 	async pullRequestID(owner: string, name: string, sha: string): Promise<string | undefined> {
 		const query = this.query(owner, name, sha);
-		const response = await this.api(query);
+		const { commit } = await this.api(query);
 
-		return response?.repository?.commit?.associatedPullRequests.edges[0]?.node.number;
+		return commit?.associatedPullRequests.edges[0]?.node.number;
 	}
 
 	private async api(query: string): Promise<GraphQlQueryResponseData> {
@@ -17,9 +17,9 @@ export class Github {
 		}
 
 		try {
-			const request = await graphql(query, { headers: { authorization: `token ${this.token}` } });
+			const { repository } = await graphql(query, { headers: { authorization: `token ${this.token}` } });
 
-			return request;
+			return repository || {};
 		} catch (error) {
 			throw Error('Cannot contact Github');
 		}
