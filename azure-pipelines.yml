@@ -38,7 +38,7 @@ steps:
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin'))
 
 - bash: |
-    Invoke-WebRequest https://update.code.visualstudio.com/api/update//win32-x64/stable/latest -O vscode-latest
+    curl https://update.code.visualstudio.com/api/update//win32-x64/stable/latest > vscode-latest
   displayName: Check vscode-latest windows
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
