@@ -33,23 +33,23 @@ steps:
     path: $(YARN_CACHE_FOLDER)
   displayName: Cache Yarn packages
 
-- bash: curl https://update.code.visualstudio.com/api/update/darwin/stable/latest > /tmp/vscode-latest
+- bash: curl https://update.code.visualstudio.com/api/update/darwin/stable/latest > vscode-latest
   displayName: Check latest darwin
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin'))
 
 - bash: |
     npm install -g node-wget
-    wget https://update.code.visualstudio.com/api/update//win32-x64/stable/latest -d /tmp/vscode-latest
+    wget https://update.code.visualstudio.com/api/update//win32-x64/stable/latest -d vscode-latest
   displayName: Check latest windows
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-- bash: curl https://update.code.visualstudio.com/api/update/linux-x64/stable/latest > /tmp/vscode-latest
+- bash: curl https://update.code.visualstudio.com/api/update/linux-x64/stable/latest > vscode-latest
   displayName: Check latest linux
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
 - task: Cache@2
   inputs:
-    key: 'vscode-test | "$(Agent.OS)" | /tmp/vscode-latest'
+    key: 'vscode-test | "$(Agent.OS)" | vscode-latest'
     path: .vscode-test
   displayName: Cache vsode-test binaries
 
