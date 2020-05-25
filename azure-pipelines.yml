@@ -35,15 +35,15 @@ steps:
 
 - bash: curl https://update.code.visualstudio.com/api/update/darwin/stable/latest > vscode-latest
   displayName: Check vscode-latest darwin
-  condition: and(eq(variables['Agent.OS'], 'Darwin'))
+  condition: eq(variables['Agent.OS'], 'Darwin')
 
 - bash: curl https://update.code.visualstudio.com/api/update/win32-x64/stable/latest > vscode-latest
   displayName: Check vscode-latest windows
-  condition: and(eq(variables['Agent.OS'], 'Windows_NT'))
+  condition: eq(variables['Agent.OS'], 'Windows_NT')
 
 - bash: curl https://update.code.visualstudio.com/api/update/linux-x64/stable/latest > vscode-latest
   displayName: Check vscode-latest linux
-  condition: and(eq(variables['Agent.OS'], 'Linux'))
+  condition: eq(variables['Agent.OS'], 'Linux')
 
 - task: Cache@2
   inputs:
