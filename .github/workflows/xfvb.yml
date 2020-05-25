@@ -16,7 +16,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - run: yarn --frozen-lockfile
+    - name: Yarn install
+      with:
+        run: yarn --frozen-lockfile
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1.0
       with:
