@@ -53,12 +53,6 @@ function nockGithubResponse(status: number, response: Object | null): void {
 		});
 }
 
-function sleep(ms: number) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
-
 suite('Test commands', () => {
 	let sandbox: sinon.SinonSandbox;
 
@@ -81,11 +75,8 @@ suite('Test commands', () => {
 			mockGit({ userName: 'User Name', commitMessage: 'Commit message (#1)' });
 
 			await vscode.commands.executeCommand('blame-pr.toggleStatusbar');
+
 			sandbox.assert.calledOnce(hideSpy);
-			assert.equal(mockStatusBarItem.text, '$(git-pull-request) $(tree-item-loading~spin)');
-
-			await sleep(10);
-
 			sandbox.assert.called(showSpy);
 			assert.equal(mockStatusBarItem.text, '$(git-pull-request) User Name: "Commit message (#1)"');
 

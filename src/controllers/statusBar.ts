@@ -2,8 +2,6 @@ import * as vscode from 'vscode';
 import { dirname } from 'path';
 import { CachedGit } from '../models/cachedGit';
 
-const LOADING_TIMEOUT = parseInt(process.env.LOADING_TIMEOUT as string) || 50; // ms
-
 export class StatusBarController {
 	private disposable: vscode.Disposable;
 	private statusBar: vscode.StatusBarItem;
@@ -61,18 +59,11 @@ export class StatusBarController {
 			if (this.currentCursor !== this.cursor) {
 				this.write('$(tree-item-loading~spin)');
 
-				this.delayUpdate();
+				this.updateStatusbar();
 			}
 		} else {
 			this.reset();
 		}
-	}
-
-	private delayUpdate(): void {
-		clearTimeout(this.timer);
-		this.timer = setTimeout(() => {
-			this.updateStatusbar();
-		}, LOADING_TIMEOUT);
 	}
 
 	private async updateStatusbar(): Promise<void> {
