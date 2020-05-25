@@ -34,17 +34,16 @@ steps:
   displayName: Cache Yarn packages
 
 - bash: curl https://update.code.visualstudio.com/api/update/darwin/stable/latest > vscode-latest
-  displayName: Check latest darwin
+  displayName: Check vscode-latest darwin
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin'))
 
 - bash: |
-    npm install -g node-wget
-    wget https://update.code.visualstudio.com/api/update//win32-x64/stable/latest -d vscode-latest
-  displayName: Check latest windows
+    Invoke-WebRequest https://update.code.visualstudio.com/api/update//win32-x64/stable/latest -O vscode-latest
+  displayName: Check vscode-latest windows
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
 - bash: curl https://update.code.visualstudio.com/api/update/linux-x64/stable/latest > vscode-latest
-  displayName: Check latest linux
+  displayName: Check vscode-latest linux
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
 - task: Cache@2
