@@ -34,7 +34,6 @@
 			],
 			"preLaunchTask": "npm: pretest",
 			"env": {
-				"LOADING_TIMEOUT": "10",
 				"CACHE_EXPIRATION": "-99"
 			}
 		}
