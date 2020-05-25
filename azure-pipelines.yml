@@ -45,8 +45,6 @@ steps:
   displayName: Check vscode-latest linux
   condition: eq(variables['Agent.OS'], 'Linux')
 
-- bash: less vscode-latest
-
 - task: Cache@2
   inputs:
     key: 'vscode-test | "$(Agent.OS)" | vscode-latest'
