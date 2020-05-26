@@ -15,7 +15,7 @@ export class OpenController {
 	private async openHandler() {
 		const editor = vscode.window.activeTextEditor;
 
-		if (editor) {
+		if (editor && editor.document.uri.scheme === 'file') {
 			const pullRequest = new PullRequest(editor, this.cache);
 
 			try {
