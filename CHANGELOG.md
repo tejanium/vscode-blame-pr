@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.0.3
+
+### Removed
+- Delay in between cursor movement when render the statusbar info
+
+### Fixed
+- Error when the cursor is focused on "Output"
+
 ## v1.0.2
 
 ### Added
@@ -11,7 +19,7 @@
 
 ### Added
 
-- Propmpt to open commit URL when PR is not available
+- Prompt to open commit URL when PR is not available
 
 ### Changed
 

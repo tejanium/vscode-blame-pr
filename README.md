@@ -10,13 +10,15 @@
 
 Open Github's associated PR by guessing the PR's ID from the commit message or contacting Github using your personal access token.
 
-To activate: place cursor where you want to know in which PR the line was introduced, open the Command Palette then type `blame-pr.open`.
+To activate, enter these commands in the Command Palette:
 
-Preview:
+- `blame-pr.open`: Open and view Github Pull Request on your browser on the selected line.
 
-<img src='https://raw.githubusercontent.com/tejanium/vscode-blame-pr/master/img/preview.gif'>
+  <img src='https://raw.githubusercontent.com/tejanium/vscode-blame-pr/master/img/preview.gif'>
 
-To display the blame info in the status bar, open the Command Palette and type `blame-pr.toggleStatusbar`, click to activate `blame-pr.open`.
+- `blame-pr.toggleStatusbar`: Display commit message info in the status bar, click to activate `blame-pr.open`.
+
+  <img src='https://raw.githubusercontent.com/tejanium/vscode-blame-pr/master/img/statusbar.png'>
 
 ## Extension Settings
 
