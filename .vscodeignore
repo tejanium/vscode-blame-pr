@@ -11,5 +11,5 @@ src/**
 **/*.yml
 **/*.md
 node_modules
-img/preview.gif
-img/token.png
+img/**
+!img/ico.png
