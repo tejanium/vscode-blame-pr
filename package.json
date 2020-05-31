@@ -48,15 +48,13 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "webpack --mode production",
-		"compile": "webpack --mode none",
+		"vscode:prepublish": "yarn compile",
+		"compile": "webpack --mode production",
+		"test-compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
 		"watch": "webpack --mode none --watch",
-		"webpack": "webpack --mode development",
-		"webpack-dev": "webpack --mode development --watch",
 		"pretest": "yarn --frozen-lockfile && yarn compile && yarn test-compile && yarn lint",
 		"test": "npm run env CACHE_EXPIRATION=-99 -- node ./out/test/runTest.js",
-		"test-compile": "tsc -p ./",
 		"deploy": "vsce publish --yarn"
 	},
 	"devDependencies": {
