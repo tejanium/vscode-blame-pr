@@ -6,7 +6,6 @@ export class StatusBarController {
 	private disposable: vscode.Disposable;
 	private statusBar: vscode.StatusBarItem;
 	private enabled: boolean = false;
-	private timer!: NodeJS.Timeout;
 	private currentCursor!: string;
 
 	constructor(private cache: any) {
@@ -89,6 +88,7 @@ export class StatusBarController {
 	}
 
 	private reset(): void {
+		this.cache.flush();
 		this.currentCursor = '';
 		this.statusBar.hide();
 	}
