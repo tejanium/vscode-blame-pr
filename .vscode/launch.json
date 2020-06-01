@@ -14,7 +14,7 @@
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [
-				"${workspaceFolder}/dist/**/*.js"
+				"${workspaceFolder}/dist/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
 		},
@@ -30,7 +30,7 @@
 				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
+				"${workspaceFolder}/dist/*.js"
 			],
 			"preLaunchTask": "npm: pretest",
 			"env": {
