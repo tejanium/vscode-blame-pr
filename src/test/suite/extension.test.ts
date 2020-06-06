@@ -7,18 +7,15 @@ import assert = require('assert');
 const mockSpawn = require('mock-spawn')();
 require('child_process').spawn = mockSpawn;
 
-function mockGit({
-	config = 'git@github.com:owner/name.git',
-	sha = 'sha1234567890',
-	commitMessage = 'message',
-	userName = 'name'
-}: {
+interface MockGitParams {
 	config?: string;
 	sha?: string;
 	commitMessage?: string;
 	userName?: string;
-}): void {
-	mockSpawn.setStrategy(function (command: string, args: Array<string>) {
+}
+
+function mockGit({ config = 'git@github.com:owner/name.git', sha = 'sha1234567890', commitMessage, userName }: MockGitParams = {}): void {
+	mockSpawn.setStrategy(function (_command: string, args: Array<string>) {
 		const fileName = vscode.window.activeTextEditor?.document.fileName;
 
 		if (args.join(',') === ['config', '--get', 'remote.origin.url'].join(',')) {
@@ -31,10 +28,6 @@ function mockGit({
 			return mockSpawn.simple(0, blame);
 		}
 	});
-}
-
-function mockValidGit(): void {
-	mockGit({});
 }
 
 function configureGithubToken(sandbox: sinon.SinonSandbox, token: string): void {
@@ -149,7 +142,7 @@ suite('Test commands', () => {
 		test('No Github personal token setup', async () => {
 			const warningStub = sandbox.stub(vscode.window, 'showWarningMessage') as sinon.SinonStub<[string, any?], Thenable<string | undefined>>;
 
-			mockValidGit();
+			mockGit();
 			configureGithubToken(sandbox, '');
 
 			await vscode.commands.executeCommand('blame-pr.open');
@@ -160,7 +153,7 @@ suite('Test commands', () => {
 		suite('Github', () => {
 			beforeEach(() => {
 				configureGithubToken(sandbox, 'token');
-				mockValidGit();
+				mockGit();
 			});
 
 			test('Getting data from github', async () => {
