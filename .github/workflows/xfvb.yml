@@ -20,7 +20,7 @@ jobs:
     - name: Yarn install
       run: yarn --frozen-lockfile
     - name: Run tests
-      uses: GabrielBB/xvfb-action@v1.2
+      uses: GabrielBB/xvfb-action@v1.0
       with:
         run: yarn test
     - name: Publish
