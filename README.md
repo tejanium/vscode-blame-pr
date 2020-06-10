@@ -1,6 +1,6 @@
 # VSCode Blame Github's Pull Request
 
-[![Build Status](https://dev.azure.com/tejanium/vscode-blame-pr/_apis/build/status/tejanium.vscode-blame-pr?branchName=master)](https://dev.azure.com/tejanium/vscode-blame-pr/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://dev.azure.com/tejanium/vscode-blame-pr/_apis/build/status/tejanium.vscode-blame-pr?branchName=master)](https://dev.azure.com/tejanium/vscode-blame-pr/_build/latest?definitionId=3&branchName=master)
 [![David](https://img.shields.io/david/tejanium/vscode-blame-pr)](https://david-dm.org/tejanium/vscode-blame-pr)
 [![David](https://img.shields.io/david/dev/tejanium/vscode-blame-pr)](https://david-dm.org/tejanium/vscode-blame-pr?type=dev)
 [![GitHub release](https://img.shields.io/github/v/release/tejanium/vscode-blame-pr)](https://github.com/tejanium/vscode-blame-pr/releases)
