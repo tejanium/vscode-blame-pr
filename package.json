@@ -54,7 +54,7 @@
 		"lint": "eslint src --ext ts",
 		"watch": "webpack --mode development --watch --info-verbosity verbose",
 		"pretest": "yarn --frozen-lockfile && yarn compile && yarn test-compile && yarn lint",
-		"test": "node ./out/test/runTest.js",
+		"test": "npm run env CACHE_EXPIRATION=-99 -- node ./out/test/runTest.js",
 		"deploy": "vsce publish --yarn"
 	},
 	"devDependencies": {
