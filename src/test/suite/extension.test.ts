@@ -71,7 +71,7 @@ suite('Test commands', () => {
 
 			sandbox.assert.calledOnce(hideSpy);
 			sandbox.assert.called(showSpy);
-			assert.equal(mockStatusBarItem.text, '$(git-pull-request) User Name: "Commit message (#1)"');
+			assert.strictEqual(mockStatusBarItem.text, '$(git-pull-request) User Name: "Commit message (#1)"');
 
 			await vscode.commands.executeCommand('blame-pr.toggleStatusbar');
 			sandbox.assert.calledTwice(hideSpy);
