@@ -17,7 +17,6 @@ export class Git {
 
 			throw Error(error.message);
 		}
-
 	}
 
 	async blame(fileName: string, lineNumber: number): Promise<{ sha: string, author: string, commitMessage: string }> {
