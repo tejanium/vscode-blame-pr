@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.0.4
+
+### Changed
+- Reset cache when hiding the statusbar
+
 ## v1.0.3
 
 ### Removed
