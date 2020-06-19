@@ -76,7 +76,7 @@
 		"vsce": "^1.77.0",
 		"vscode-test": "^1.4.0",
 		"webpack": "^4.43.0",
-		"webpack-cli": "^3.3.11"
+		"webpack-cli": "^3.3.12"
 	},
 	"dependencies": {
 		"@octokit/graphql": "^4.5.1",
