@@ -150,6 +150,26 @@ suite('Test commands', () => {
 			sandbox.assert.calledWith(warningStub, 'Github personal access token is missing');
 		});
 
+		test('Get PR URL from HTTP URL', async () => {
+			const openExternalStub = sandbox.stub(vscode.env, 'openExternal');
+
+			mockGit({ config: 'http://github.com/owner/name.git', commitMessage: 'First PR (#1)' });
+
+			await vscode.commands.executeCommand('blame-pr.open');
+
+			sandbox.assert.calledWith(openExternalStub, vscode.Uri.parse('https://github.com/owner/name/pull/1'));
+		});
+
+		test('Get PR URL from HTTPS URL', async () => {
+			const openExternalStub = sandbox.stub(vscode.env, 'openExternal');
+
+			mockGit({ config: 'https://github.com/owner/name.git', commitMessage: 'First PR (#1)' });
+
+			await vscode.commands.executeCommand('blame-pr.open');
+
+			sandbox.assert.calledWith(openExternalStub, vscode.Uri.parse('https://github.com/owner/name/pull/1'));
+		});
+
 		suite('Github', () => {
 			beforeEach(() => {
 				configureGithubToken(sandbox, 'token');
