@@ -4,7 +4,7 @@
 	"displayName": "Blame Github's Pull Request",
 	"description": "Blame and open Github's associated PR.",
 	"icon": "img/ico.png",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"homepage": "https://github.com/tejanium/vscode-blame-pr/blob/master/README.md",
 	"bugs": {
 		"url": "https://github.com/tejanium/vscode-blame-pr/issues"
