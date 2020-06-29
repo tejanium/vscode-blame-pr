@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.0.5
+
+### Fixed
+- Broken URL if git remote is HTTP or HTTPS
+
 ## v1.0.4
 
 ### Changed
