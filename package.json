@@ -71,7 +71,7 @@
 		"mock-spawn": "^0.2.6",
 		"nock": "^13.0.4",
 		"sinon": "^9.1.0",
-		"ts-loader": "^8.0.4",
+		"ts-loader": "^8.0.6",
 		"typescript": "^3.9.7",
 		"vsce": "^1.81.1",
 		"vscode-test": "^1.4.0",
