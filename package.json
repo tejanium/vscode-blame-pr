@@ -79,7 +79,7 @@
 		"webpack-cli": "^4.2.0"
 	},
 	"dependencies": {
-		"@octokit/graphql": "^4.5.8",
+		"@octokit/graphql": "^4.6.1",
 		"await-spawn": "^4.0.1",
 		"vscode-cache": "^0.3.0"
 	}
