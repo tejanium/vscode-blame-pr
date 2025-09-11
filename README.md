@@ -22,5 +22,5 @@ To activate, enter these commands in the Command Palette:
 
 ## Extension Settings
 
-* `blame-pr.githubToken`: Github personal access token with scope to repo.
-  <img src='https://raw.githubusercontent.com/tejanium/vscode-blame-pr/master/img/token.png' width='50%'>
+* `blame-pr.useOAuth`: Use GitHub OAuth (via VS Code auth). If false, only public data is used.
+* `blame-pr.enablePrefetch`: Enable cursor-based prefetching for instant toolbar responses. Prefetches PR data when you dwell on a line.

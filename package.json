@@ -4,7 +4,7 @@
 	"displayName": "Blame Github's Pull Request",
 	"description": "Blame and open Github's associated PR.",
 	"icon": "img/ico.png",
-	"version": "1.0.5",
+	"version": "1.1.0",
 	"homepage": "https://github.com/tejanium/vscode-blame-pr/blob/master/README.md",
 	"bugs": {
 		"url": "https://github.com/tejanium/vscode-blame-pr/issues"
@@ -15,16 +15,13 @@
 		"url": "https://github.com/tejanium/vscode-blame-pr"
 	},
 	"engines": {
-		"vscode": "^1.47.0"
+		"vscode": "^1.63.0"
 	},
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"onCommand:blame-pr.open",
-		"onCommand:blame-pr.toggleStatusbar"
-	],
-	"main": "./dist/extension",
+	"activationEvents": [],
+	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
@@ -39,48 +36,48 @@
 		"configuration": {
 			"title": "Blame Github's PR",
 			"properties": {
-				"blame-pr.githubToken": {
-					"type": "string",
-					"default": "",
-					"description": "Github personal access token with access to repo."
+				"blame-pr.useOAuth": {
+					"type": "boolean",
+					"default": false,
+					"description": "Use GitHub OAuth (via VS Code auth). If false, only public data is used."
+				},
+				"blame-pr.enablePrefetch": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable cursor-based prefetching for instant toolbar responses. Prefetches PR data when you dwell on a line for 500ms."
 				}
 			}
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "webpack --mode production",
-		"compile": "webpack --mode development",
+		"vscode:prepublish": "bun build src/extension.ts --outdir dist --format=cjs --target=node --external vscode --sourcemap",
+		"compile": "bun build src/extension.ts --outdir dist --format=cjs --target=node --external vscode --sourcemap",
 		"test-compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
-		"watch": "webpack --mode development --watch --info-verbosity verbose",
+		"watch": "bun build src/extension.ts --outdir dist --format=cjs --target=node --external vscode --sourcemap --watch",
 		"pretest": "yarn --frozen-lockfile && yarn compile && yarn test-compile && yarn lint",
-		"test": "npm run env CACHE_EXPIRATION=-99 -- node ./out/test/runTest.js",
-		"deploy": "vsce publish --yarn"
+		"test": "jest",
+		"package": "npx @vscode/vsce package",
+		"clean-build": "rm -rf dist out *.vsix && yarn compile && yarn package",
+		"deploy": "npx @vscode/vsce publish --yarn"
 	},
 	"devDependencies": {
-		"@types/glob": "^7.1.4",
-		"@types/mocha": "^9.0.0",
-		"@types/node": "^16.7.10",
-		"@types/sinon": "^10.0.2",
-		"@types/vscode": "^1.59.0",
-		"@typescript-eslint/eslint-plugin": "^2.34.0",
-		"@typescript-eslint/parser": "^4.30.0",
-		"eslint": "^6.8.0",
-		"glob": "^7.1.7",
-		"mocha": "^9.1.1",
-		"mock-spawn": "^0.2.6",
-		"nock": "^13.1.3",
-		"sinon": "^11.1.2",
-		"ts-loader": "^9.2.5",
-		"typescript": "^3.9.7",
-		"vsce": "^1.96.3",
-		"vscode-test": "^1.6.1",
-		"webpack": "^5.51.1",
-		"webpack-cli": "^4.8.0"
+		"@eslint/js": "^9.35.0",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^24.3.1",
+		"@types/vscode": "^1.63.0",
+		"@typescript-eslint/eslint-plugin": "^8.43.0",
+		"@typescript-eslint/parser": "^8.43.0",
+		"@vscode/vsce": "^2.15.0",
+		"eslint": "^9.35.0",
+		"jest": "^30.1.3",
+		"jest-mock-vscode": "^4.6.0",
+		"nock": "^14.0.10",
+		"ts-jest": "^29.4.1",
+		"typescript": "5.9.2",
+		"typescript-eslint": "^8.43.0"
 	},
 	"dependencies": {
-		"@octokit/graphql": "^4.8.0",
-		"await-spawn": "^4.0.2",
-		"vscode-cache": "^0.3.0"
+		"simple-git": "^3.28.0"
 	}
 }

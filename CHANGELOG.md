@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.1.0
+
+### Added
+- Replace PAT with GitHub authentication
+
 ## v1.0.5
 
 ### Fixed

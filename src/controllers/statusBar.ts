@@ -1,95 +1,144 @@
-import * as vscode from 'vscode';
-import { dirname } from 'path';
-import { CachedGit } from '../models/cachedGit';
+import * as vscode from "vscode";
+import { dirname } from "path";
+import { CachedGit } from "../models/cachedGit";
+import { PrefetchManager } from "../models/prefetchManager";
 
 export class StatusBarController {
-	private disposable: vscode.Disposable;
-	private statusBar: vscode.StatusBarItem;
-	private enabled: boolean = false;
-	private currentCursor!: string;
+  private disposable: vscode.Disposable;
+  private statusBar: vscode.StatusBarItem;
+  private enabled: boolean = false;
+  private currentCursor!: string;
+  private prefetchManager: PrefetchManager;
 
-	constructor(private cache: any) {
-		this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-		this.statusBar.command = 'blame-pr.open';
+  constructor(private cache: any) {
+    this.statusBar = vscode.window.createStatusBarItem(
+      vscode.StatusBarAlignment.Left
+    );
+    this.statusBar.command = "blame-pr.open";
+    this.prefetchManager = new PrefetchManager(cache);
 
-		const command = vscode.commands.registerCommand('blame-pr.toggleStatusbar', this.toggle.bind(this));
+    const command = vscode.commands.registerCommand(
+      "blame-pr.toggleStatusbar",
+      this.toggle.bind(this)
+    );
 
-		let subscriptions: vscode.Disposable[] = [command, this.statusBar];
+    const subscriptions: vscode.Disposable[] = [command, this.statusBar];
 
-		vscode.window.onDidChangeTextEditorSelection(this.update, this, subscriptions);
-		vscode.window.onDidChangeActiveTextEditor(this.update, this, subscriptions);
+    vscode.window.onDidChangeTextEditorSelection(
+      this.update,
+      this,
+      subscriptions
+    );
+    vscode.window.onDidChangeActiveTextEditor(this.update, this, subscriptions);
 
-		this.disposable = vscode.Disposable.from(...subscriptions);
+    this.disposable = vscode.Disposable.from(...subscriptions);
 
-		this.reset();
-	}
+    this.reset();
+  }
 
-	dispose() {
-		this.disposable.dispose();
-	}
+  dispose() {
+    this.prefetchManager.dispose();
+    this.disposable.dispose();
+  }
 
-	private get editor(): vscode.TextEditor | undefined {
-		return vscode.window.activeTextEditor;
-	}
+  private get editor(): vscode.TextEditor | undefined {
+    return vscode.window.activeTextEditor;
+  }
 
-	private get lineNumber(): number | undefined {
-		if (this.editor) {
-			return this.editor.selection.active.line + 1;
-		}
-	}
+  private get lineNumber(): number | undefined {
+    if (this.editor) {
+      return this.editor.selection.active.line + 1;
+    }
+  }
 
-	private get fileName(): string | undefined {
-		if (this.editor) {
-			return this.editor.document.fileName;
-		}
-	}
+  private get fileName(): string | undefined {
+    if (this.editor) {
+      return this.editor.document.fileName;
+    }
+  }
 
-	private get cursor(): string {
-		return [this.fileName, this.lineNumber].join(':');
-	}
+  private get cursor(): string {
+    return [this.fileName, this.lineNumber].join(":");
+  }
 
-	private async toggle() {
-		this.enabled = !this.enabled;
-		this.update();
-	}
+  private async toggle() {
+    this.enabled = !this.enabled;
+    this.update();
+  }
 
-	private async update(): Promise<void> {
-		if (this.enabled) {
-			if (this.currentCursor !== this.cursor) {
-				this.write('$(tree-item-loading~spin)');
+  private async update(): Promise<void> {
+    if (this.enabled) {
+      if (this.currentCursor !== this.cursor) {
+        this.prefetchManager.cancelPrefetch();
 
-				this.updateStatusbar();
-			}
-		} else {
-			this.reset();
-		}
-	}
+        this.updateStatusbar();
 
-	private async updateStatusbar(): Promise<void> {
-		if (this.fileName && this.lineNumber) {
-			const git = new CachedGit(this.cache, dirname(this.fileName));
+        if (this.fileName && this.lineNumber && this.editor) {
+          this.prefetchManager.schedulePrefetch(
+            this.fileName,
+            this.lineNumber,
+            this.editor
+          );
+        }
+      }
+    } else {
+      this.reset();
+    }
+  }
 
-			try {
-				const { author, commitMessage } = await git.blame(this.fileName, this.lineNumber);
+  private async updateStatusbar(): Promise<void> {
+    if (this.fileName && this.lineNumber && this.editor) {
+      const git = new CachedGit(this.cache, dirname(this.fileName));
 
-				this.currentCursor = this.cursor;
-				this.write(`${author}: "${commitMessage}"`);
-				this.statusBar.show();
-			} catch {
-				this.statusBar.hide();
-			}
-		} else {
-			this.statusBar.hide();
-		}
-	}
+      let lineContent: string | undefined;
+      try {
+        lineContent = this.editor.document.lineAt(this.lineNumber - 1).text;
+      } catch {
+        lineContent = undefined;
+      }
 
-	private write(text: string): void {
-		this.statusBar.text = `$(git-pull-request) ${text}`;
-	}
+      // Check for cached blame first for instant display
+      const cachedBlame = git.getCachedBlame(
+        this.fileName,
+        this.lineNumber,
+        lineContent
+      );
 
-	private reset(): void {
-		this.cache.flush();
-		this.currentCursor = '';
-		this.statusBar.hide();
-	}
+      if (cachedBlame) {
+        this.currentCursor = this.cursor;
+        this.write(`${cachedBlame.author}: "${cachedBlame.commitMessage}"`);
+        this.statusBar.show();
+      } else {
+        this.write("$(tree-item-loading~spin)");
+        this.statusBar.show();
+
+        try {
+          const { author, commitMessage } = await git.blame(
+            this.fileName,
+            this.lineNumber,
+            lineContent
+          );
+
+          this.currentCursor = this.cursor;
+          this.write(`${author}: "${commitMessage}"`);
+          this.statusBar.show();
+        } catch {
+          this.statusBar.hide();
+        }
+      }
+    } else {
+      this.statusBar.hide();
+    }
+  }
+
+  private write(text: string): void {
+    this.statusBar.text = `$(git-pull-request) ${text}`;
+  }
+
+  private reset(): void {
+    this.cache.flush();
+    this.currentCursor = "";
+    this.statusBar.hide();
+    this.prefetchManager.cancelPrefetch();
+  }
 }

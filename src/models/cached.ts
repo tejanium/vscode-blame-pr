@@ -1,23 +1,58 @@
-const CACHE_EXPIRATION = parseInt(process.env.CACHE_EXPIRATION as string) || 30; // s
+export const GIT_CACHE_EXPIRATION =
+  parseInt(process.env.GIT_CACHE_EXPIRATION as string) || 30;
 
 export class Cached {
-	constructor(private cache: any) { }
+  constructor(
+    protected cache: {
+      has: (k: string) => boolean;
+      get: (k: string) => any;
+      put: (k: string, v: any, ttl: number) => void;
+    }
+  ) {}
 
-	async fetch(key: string, fn: Function): Promise<any> {
-		if (this.cache.has(key)) {
-			return this.cache.get(key);
-		} else {
-			const data = await fn();
+  getCached(key: string): any | undefined {
+    if (this.cache.has(key)) {
+      return this.cache.get(key);
+    }
+    return undefined;
+  }
 
-			if (this.notEmpty(data)) {
-				this.cache.put(key, data, CACHE_EXPIRATION);
-			}
+  async fetch(key: string, fn: Function, ttl?: number): Promise<any> {
+    if (this.cache.has(key)) {
+      return this.cache.get(key);
+    } else {
+      const data = await fn();
 
-			return data;
-		}
-	}
+      if (this.notEmpty(data)) {
+        // Use provided TTL or default to git cache expiration
+        const cacheExpiration = ttl ?? GIT_CACHE_EXPIRATION;
+        this.cache.put(key, data, cacheExpiration);
+      }
 
-	notEmpty(data: any): Boolean {
-		return Object.values(data || '').every((value) => Boolean(value) );
-	}
+      return data;
+    }
+  }
+
+  notEmpty(data: any): Boolean {
+    if (data === undefined || data === null) {
+      return false;
+    }
+
+    if (typeof data === "string") {
+      return data.length > 0;
+    }
+
+    if (Array.isArray(data)) {
+      return data.length > 0 && data.every((value) => Boolean(value));
+    }
+
+    if (typeof data === "object") {
+      const keys = Object.keys(data);
+      return (
+        keys.length > 0 && Object.values(data).every((value) => Boolean(value))
+      );
+    }
+
+    return Boolean(data);
+  }
 }

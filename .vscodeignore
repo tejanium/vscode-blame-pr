@@ -1,17 +1,38 @@
+# VS Code and test directories
 .vscode/**
 .vscode-test/**
+
+# Build artifacts (keep dist/ for production)
 out/**
 src/**
+
+# Test files and mocks
+__tests__/**
+__mocks__/**
+
+# Configuration files
 .gitignore
 **/tsconfig.json
-**/webpack.config.js
 **/.eslintrc.json
+**/jest.config.js
+**/bunfig.toml
+
+# Source maps and TypeScript files
 **/*.map
 **/*.ts
+
+# Build and dependency files
 **/*.yml
-**/*.md
 node_modules
-img/**
-!img/ico.png
+yarn.lock
+bun.lock
+*.vsix
+
+# Documentation (exclude all, then include specific ones)
+**/*.md
 !README.md
 !CHANGELOG.md
+
+# Images (exclude all, then include icon)
+img/**
+!img/ico.png
