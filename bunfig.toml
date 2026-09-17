@@ -1,5 +1,0 @@
-[build]
-external = ["vscode", "await-spawn", "vscode-cache"]
-format = "cjs"
-minify = false
-sourcemap = true

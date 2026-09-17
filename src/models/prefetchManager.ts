@@ -17,7 +17,7 @@ export class PrefetchManager {
   schedulePrefetch(
     fileName: string,
     lineNumber: number,
-    editor: vscode.TextEditor
+    editor: vscode.TextEditor,
   ): void {
     if (this.prefetchTimeout) {
       clearTimeout(this.prefetchTimeout);
@@ -37,7 +37,7 @@ export class PrefetchManager {
   private async prefetchCurrentLine(
     fileName: string,
     lineNumber: number,
-    editor: vscode.TextEditor
+    editor: vscode.TextEditor,
   ): Promise<void> {
     const prefetchEnabled = vscode.workspace
       .getConfiguration("blame-pr")

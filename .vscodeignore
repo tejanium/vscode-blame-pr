@@ -12,10 +12,13 @@ __mocks__/**
 
 # Configuration files
 .gitignore
+.node-version
 **/tsconfig.json
-**/.eslintrc.json
-**/jest.config.js
-**/bunfig.toml
+**/eslint.config.mjs
+**/vitest.config.mts
+.prettierrc
+.prettierignore
+.editorconfig
 
 # Source maps and TypeScript files
 **/*.map
@@ -24,7 +27,6 @@ __mocks__/**
 # Build and dependency files
 **/*.yml
 node_modules
-yarn.lock
 bun.lock
 *.vsix
 

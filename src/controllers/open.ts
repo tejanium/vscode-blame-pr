@@ -7,7 +7,7 @@ export class OpenController {
   constructor(private cache: any) {
     this.disposable = vscode.commands.registerCommand(
       "blame-pr.open",
-      this.openHandler.bind(this)
+      this.openHandler.bind(this),
     );
   }
 
@@ -37,7 +37,7 @@ export class OpenController {
     owner: string,
     name: string,
     sha: string,
-    PRId: string | undefined
+    PRId: string | undefined,
   ): Promise<void> {
     if (PRId) {
       const url = `https://${domain}/${owner}/${name}/pull/${PRId}`;
@@ -47,7 +47,7 @@ export class OpenController {
       const message = `${sha.substr(0, 7)} has no associated PR`;
       const response = await vscode.window.showWarningMessage(
         message,
-        "Open commit URL"
+        "Open commit URL",
       );
 
       if (response) {

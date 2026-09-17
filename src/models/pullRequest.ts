@@ -10,7 +10,10 @@ export class PullRequest {
   private git: CachedGit;
   private authManager: AuthenticationManager;
 
-  constructor(private editor: vscode.TextEditor, private cache: any) {
+  constructor(
+    private editor: vscode.TextEditor,
+    private cache: any,
+  ) {
     this.fileName = editor.document.fileName;
     this.lineNumber = editor.selection.active.line + 1;
     this.git = new CachedGit(this.cache, dirname(this.fileName));
@@ -36,13 +39,13 @@ export class PullRequest {
     const { sha, commitMessage } = await this.git.blame(
       this.fileName,
       this.lineNumber,
-      lineContent
+      lineContent,
     );
 
     const PRId =
       this.localID(commitMessage) ||
       (await CommitCache.getCachedPRId(owner, name, sha, () =>
-        this.remoteID(owner, name, sha)
+        this.remoteID(owner, name, sha),
       ));
 
     return { domain, owner, name, sha, PRId };
@@ -58,7 +61,7 @@ export class PullRequest {
   private async remoteID(
     owner: string,
     name: string,
-    sha: string
+    sha: string,
   ): Promise<string | undefined> {
     const useOAuth =
       vscode.workspace

@@ -1,20 +1,78 @@
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+  type MockedClass,
+  type MockInstance,
+} from "vitest";
 import * as vscode from "vscode";
 import { CachedGit } from "../src/models/cachedGit";
 import { CachedGithub } from "../src/models/cachedGithub";
 import { FileBlameCache } from "../src/models/fileBlameCache";
 import { PullRequest } from "../src/models/pullRequest";
-import nock = require("nock");
+import nock from "nock";
+
+vi.mock("vscode", () => ({
+  commands: {
+    registerCommand: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+    executeCommand: vi.fn(),
+  },
+  window: {
+    createStatusBarItem: vi.fn(),
+    activeTextEditor: {
+      document: {
+        fileName: "/test/file.txt",
+        uri: { scheme: "file" },
+      },
+      selection: {
+        active: { line: 0 },
+      },
+    },
+    showWarningMessage: vi.fn(),
+    onDidChangeTextEditorSelection: vi
+      .fn()
+      .mockReturnValue({ dispose: vi.fn() }),
+    onDidChangeActiveTextEditor: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+    visibleTextEditors: [],
+  },
+  env: { openExternal: vi.fn().mockResolvedValue(true) },
+  Uri: {
+    parse: vi.fn((url: string) => ({ toString: () => url })),
+    file: vi.fn((path: string) => ({ toString: () => path })),
+  },
+  workspace: {
+    getConfiguration: vi.fn(),
+    onDidCloseTextDocument: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+    createFileSystemWatcher: vi.fn().mockReturnValue({
+      onDidChange: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+      onDidDelete: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+      dispose: vi.fn(),
+    }),
+    fs: {
+      stat: vi.fn().mockResolvedValue({ mtime: Date.now() }),
+    },
+  },
+  authentication: {
+    getSession: vi.fn(),
+  },
+  Disposable: {
+    from: vi.fn().mockReturnValue({ dispose: vi.fn() }),
+  },
+  StatusBarAlignment: { Left: 1, Right: 2 },
+}));
 
 // Mock the cached classes
-jest.mock("../src/models/cachedGit");
-jest.mock("../src/models/cachedGithub");
-jest.mock("../src/models/fileBlameCache");
+vi.mock("../src/models/cachedGit");
+vi.mock("../src/models/cachedGithub");
+vi.mock("../src/models/fileBlameCache");
 
-const MockedCachedGit = CachedGit as jest.MockedClass<typeof CachedGit>;
-const MockedCachedGithub = CachedGithub as jest.MockedClass<
-  typeof CachedGithub
->;
-const MockedFileBlameCache = FileBlameCache as jest.MockedClass<
+const MockedCachedGit = CachedGit as MockedClass<typeof CachedGit>;
+const MockedCachedGithub = CachedGithub as MockedClass<typeof CachedGithub>;
+const MockedFileBlameCache = FileBlameCache as MockedClass<
   typeof FileBlameCache
 >;
 
@@ -36,107 +94,52 @@ function nockGithubResponse(status: number, response: Object | null): void {
 }
 
 describe("Extension Integration Tests", () => {
-  let registerCommandSpy: jest.SpyInstance;
-  let createStatusBarItemSpy: jest.SpyInstance;
-  let openExternalSpy: jest.SpyInstance;
-  let showWarningMessageSpy: jest.SpyInstance;
-  let getSessionSpy: jest.SpyInstance;
-  let getConfigurationSpy: jest.SpyInstance;
+  let registerCommandSpy: MockInstance;
+  let createStatusBarItemSpy: MockInstance;
+  let openExternalSpy: MockInstance;
+  let showWarningMessageSpy: MockInstance;
+  let getSessionSpy: MockInstance;
+  let getConfigurationSpy: MockInstance;
   let statusItem: any;
   let mockWorkspaceState: any;
 
   beforeAll(() => {
-    // Setup vscode mocks
-    (vscode as any).commands = {
-      registerCommand: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-      executeCommand: jest.fn(),
-    };
-
-    (vscode as any).window = {
-      createStatusBarItem: jest.fn(),
-      activeTextEditor: {
-        document: {
-          fileName: "/test/file.txt",
-          uri: { scheme: "file" },
-        },
-        selection: {
-          active: { line: 0 },
-        },
-      },
-      showWarningMessage: jest.fn(),
-      onDidChangeTextEditorSelection: jest
-        .fn()
-        .mockReturnValue({ dispose: jest.fn() }),
-      onDidChangeActiveTextEditor: jest
-        .fn()
-        .mockReturnValue({ dispose: jest.fn() }),
-      visibleTextEditors: [],
-    };
-
-    (vscode as any).env = { openExternal: jest.fn().mockResolvedValue(true) };
-
-    (vscode as any).Uri = {
-      parse: jest.fn((url: string) => ({ toString: () => url })),
-      file: jest.fn((path: string) => ({ toString: () => path })),
-    };
-
-    (vscode as any).workspace = {
-      getConfiguration: jest.fn(),
-      onDidCloseTextDocument: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-      createFileSystemWatcher: jest.fn().mockReturnValue({
-        onDidChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-        onDidDelete: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-        dispose: jest.fn(),
-      }),
-      fs: {
-        stat: jest.fn().mockResolvedValue({ mtime: Date.now() }),
-      },
-    };
-
-    (vscode as any).authentication = {
-      getSession: jest.fn(),
-    };
-
-    (vscode as any).Disposable = {
-      from: jest.fn().mockReturnValue({ dispose: jest.fn() }),
-    };
-
     // Create spies
-    registerCommandSpy = jest.spyOn(vscode.commands, "registerCommand");
-    createStatusBarItemSpy = jest.spyOn(vscode.window, "createStatusBarItem");
-    openExternalSpy = jest.spyOn(vscode.env, "openExternal");
-    showWarningMessageSpy = jest.spyOn(vscode.window, "showWarningMessage");
-    getSessionSpy = jest.spyOn(vscode.authentication, "getSession");
-    getConfigurationSpy = jest.spyOn(vscode.workspace, "getConfiguration");
+    registerCommandSpy = vi.spyOn(vscode.commands, "registerCommand");
+    createStatusBarItemSpy = vi.spyOn(vscode.window, "createStatusBarItem");
+    openExternalSpy = vi.spyOn(vscode.env, "openExternal");
+    showWarningMessageSpy = vi.spyOn(vscode.window, "showWarningMessage");
+    getSessionSpy = vi.spyOn(vscode.authentication, "getSession");
+    getConfigurationSpy = vi.spyOn(vscode.workspace, "getConfiguration");
 
     // Setup status bar item mock
     statusItem = {
       text: "",
-      show: jest.fn(),
-      hide: jest.fn(),
+      show: vi.fn(),
+      hide: vi.fn(),
     };
     createStatusBarItemSpy.mockReturnValue(statusItem);
 
     // Setup workspace state mock
     mockWorkspaceState = {
-      get: jest.fn(),
-      update: jest.fn(),
+      get: vi.fn(),
+      update: vi.fn(),
     };
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     MockedCachedGit.mockClear();
     MockedCachedGithub.mockClear();
 
     // Mock FileBlameCache singleton
     const mockFileBlameCacheInstance = {
-      getBlame: jest.fn().mockResolvedValue(undefined),
-      onFileOpened: jest.fn(),
-      onFileClosed: jest.fn(),
-      dispose: jest.fn(),
+      getBlame: vi.fn().mockResolvedValue(undefined),
+      onFileOpened: vi.fn(),
+      onFileClosed: vi.fn(),
+      dispose: vi.fn(),
     };
-    MockedFileBlameCache.getInstance = jest
+    MockedFileBlameCache.getInstance = vi
       .fn()
       .mockReturnValue(mockFileBlameCacheInstance);
 
@@ -155,7 +158,7 @@ describe("Extension Integration Tests", () => {
     userName,
   }: MockGitParams = {}): void {
     const mockGitInstance = {
-      config: jest.fn().mockImplementation(() => {
+      config: vi.fn().mockImplementation(() => {
         if (!config) {
           throw new Error("Could not get Git info, please try a little later");
         }
@@ -167,8 +170,8 @@ describe("Extension Integration Tests", () => {
           name: "name",
         });
       }),
-      getCachedBlame: jest.fn().mockReturnValue(undefined),
-      blame: jest.fn().mockImplementation(() => {
+      getCachedBlame: vi.fn().mockReturnValue(undefined),
+      blame: vi.fn().mockImplementation(() => {
         if (!config) {
           throw new Error("Could not get Git info, please try a little later");
         }
@@ -182,12 +185,14 @@ describe("Extension Integration Tests", () => {
         });
       }),
     };
-    MockedCachedGit.mockImplementation(() => mockGitInstance as any);
+    MockedCachedGit.mockImplementation(function () {
+      return mockGitInstance as any;
+    });
   }
 
   function configureGithubToken(token: string): void {
     getConfigurationSpy.mockReturnValue({
-      get: jest.fn().mockReturnValue(token),
+      get: vi.fn().mockReturnValue(token),
     } as any);
   }
 
@@ -202,8 +207,8 @@ describe("Extension Integration Tests", () => {
 
       // Execute the command
       const toggleCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.toggleStatusbar"
-      )[1];
+        (call) => call[0] === "blame-pr.toggleStatusbar",
+      )![1];
 
       await toggleCommand();
 
@@ -213,7 +218,7 @@ describe("Extension Integration Tests", () => {
       expect(statusItem.hide).toHaveBeenCalledTimes(1);
       expect(statusItem.show).toHaveBeenCalled();
       expect(statusItem.text).toBe(
-        '$(git-pull-request) User Name: "Commit message (#1)"'
+        '$(git-pull-request) User Name: "Commit message (#1)"',
       );
 
       await toggleCommand();
@@ -232,14 +237,14 @@ describe("Extension Integration Tests", () => {
 
       // Execute the command
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(openExternalSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           toString: expect.any(Function),
-        })
+        }),
       );
 
       const calledUrl = openExternalSpy.mock.calls[0][0].toString();
@@ -255,14 +260,14 @@ describe("Extension Integration Tests", () => {
       await extension.activate(context as any);
 
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(openExternalSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           toString: expect.any(Function),
-        })
+        }),
       );
 
       const calledUrl = openExternalSpy.mock.calls[0][0].toString();
@@ -281,14 +286,14 @@ describe("Extension Integration Tests", () => {
       await extension.activate(context as any);
 
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(openExternalSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           toString: expect.any(Function),
-        })
+        }),
       );
 
       const calledUrl = openExternalSpy.mock.calls[0][0].toString();
@@ -304,8 +309,8 @@ describe("Extension Integration Tests", () => {
       await extension.activate(context as any);
 
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(showWarningMessageSpy).toHaveBeenCalledWith("Not Committed Yet");
@@ -320,12 +325,12 @@ describe("Extension Integration Tests", () => {
       await extension.activate(context as any);
 
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(showWarningMessageSpy).toHaveBeenCalledWith(
-        "Could not get Git info, please try a little later"
+        "Could not get Git info, please try a little later",
       );
     });
 
@@ -341,14 +346,14 @@ describe("Extension Integration Tests", () => {
       await extension.activate(context as any);
 
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(openExternalSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           toString: expect.any(Function),
-        })
+        }),
       );
 
       const calledUrl = openExternalSpy.mock.calls[0][0].toString();
@@ -367,14 +372,14 @@ describe("Extension Integration Tests", () => {
       await extension.activate(context as any);
 
       const openCommand = registerCommandSpy.mock.calls.find(
-        (call) => call[0] === "blame-pr.open"
-      )[1];
+        (call) => call[0] === "blame-pr.open",
+      )![1];
       await openCommand();
 
       expect(openExternalSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           toString: expect.any(Function),
-        })
+        }),
       );
 
       const calledUrl = openExternalSpy.mock.calls[0][0].toString();
@@ -390,9 +395,11 @@ describe("Extension Integration Tests", () => {
 
       test("Getting data from github", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(10),
+          pullRequestID: vi.fn().mockResolvedValue(10),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(200, {
           commit: {
@@ -417,14 +424,14 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         expect(openExternalSpy).toHaveBeenCalledWith(
           expect.objectContaining({
             toString: expect.any(Function),
-          })
+          }),
         );
 
         const calledUrl = openExternalSpy.mock.calls[0][0].toString();
@@ -433,9 +440,11 @@ describe("Extension Integration Tests", () => {
 
       test("Getting no associated PR data from github", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(null),
+          pullRequestID: vi.fn().mockResolvedValue(null),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(200, {
           commit: null,
@@ -450,21 +459,23 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         expect(showWarningMessageSpy).toHaveBeenCalledWith(
           expect.stringMatching(/sha1234.*has no associated PR/),
-          "Open commit URL"
+          "Open commit URL",
         );
       });
 
       test("Getting empty associated PR data from github", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(null),
+          pullRequestID: vi.fn().mockResolvedValue(null),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(200, {
           commit: {
@@ -483,21 +494,23 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         expect(showWarningMessageSpy).toHaveBeenCalledWith(
           expect.stringMatching(/sha1234.*has no associated PR/),
-          "Open commit URL"
+          "Open commit URL",
         );
       });
 
       test("Getting no data from github", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(null),
+          pullRequestID: vi.fn().mockResolvedValue(null),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(200, null);
 
@@ -510,21 +523,23 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         expect(showWarningMessageSpy).toHaveBeenCalledWith(
           expect.stringMatching(/sha1234.*has no associated PR/),
-          "Open commit URL"
+          "Open commit URL",
         );
       });
 
       test("Getting 500 from github", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(null),
+          pullRequestID: vi.fn().mockResolvedValue(null),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(500, null);
 
@@ -537,21 +552,23 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         expect(showWarningMessageSpy).toHaveBeenCalledWith(
           expect.stringMatching(/sha1234.*has no associated PR/),
-          "Open commit URL"
+          "Open commit URL",
         );
       });
 
       test("Open commit URL", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(null),
+          pullRequestID: vi.fn().mockResolvedValue(null),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(200, null);
 
@@ -568,27 +585,29 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         expect(openExternalSpy).toHaveBeenCalledWith(
           expect.objectContaining({
             toString: expect.any(Function),
-          })
+          }),
         );
 
         const calledUrl = openExternalSpy.mock.calls[0][0].toString();
         expect(calledUrl).toBe(
-          "https://github.com/owner/name/commit/sha1234567890"
+          "https://github.com/owner/name/commit/sha1234567890",
         );
       });
 
       test("Not Open commit URL", async () => {
         const mockGithubInstance = {
-          pullRequestID: jest.fn().mockResolvedValue(null),
+          pullRequestID: vi.fn().mockResolvedValue(null),
         };
-        MockedCachedGithub.mockImplementation(() => mockGithubInstance as any);
+        MockedCachedGithub.mockImplementation(function () {
+          return mockGithubInstance as any;
+        });
 
         nockGithubResponse(200, null);
 
@@ -603,15 +622,15 @@ describe("Extension Integration Tests", () => {
         await extension.activate(context as any);
 
         const openCommand = registerCommandSpy.mock.calls.find(
-          (call) => call[0] === "blame-pr.open"
-        )[1];
+          (call) => call[0] === "blame-pr.open",
+        )![1];
         await openCommand();
 
         // Should not call openExternal for commit URL
         expect(openExternalSpy).not.toHaveBeenCalledWith(
           expect.objectContaining({
             toString: () => expect.stringMatching(/commit\/sha1234567890$/),
-          })
+          }),
         );
       });
     });

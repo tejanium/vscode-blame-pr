@@ -1,0 +1,29 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+      - run: bun run package
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: "*.vsix"
+          generate_release_notes: true
+      - name: Publish to VS Code Marketplace
+        if: ${{ secrets.VSCE_PAT != '' }}
+        run: bunx @vscode/vsce publish --no-dependencies --packagePath *.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish to Open VSX
+        if: ${{ secrets.OVSX_PAT != '' }}
+        run: bunx ovsx publish *.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}

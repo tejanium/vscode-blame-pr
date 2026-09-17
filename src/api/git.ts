@@ -23,16 +23,16 @@ export class Git {
         (err as any).code = 1;
       }
       if ((err as any).code === 1) {
-        throw Error("Git has no remote info");
+        throw new Error("Git has no remote info", { cause: error });
       }
 
-      throw Error(String(err.message));
+      throw new Error(String(err.message), { cause: error });
     }
   }
 
   async blame(
     fileName: string,
-    lineNumber: number
+    lineNumber: number,
   ): Promise<{ sha: string; author: string; commitMessage: string }> {
     const args = ["blame", "-p", fileName, "-L", `${lineNumber},${lineNumber}`];
     const blame = await this.git.raw(args);
@@ -41,7 +41,7 @@ export class Git {
   }
 
   async blameFile(
-    fileName: string
+    fileName: string,
   ): Promise<Array<{ sha: string; author: string; commitMessage: string }>> {
     const args = ["blame", "-p", fileName];
     const blame = await this.git.raw(args);
@@ -87,7 +87,7 @@ export class Git {
   }
 
   private parseFileBlame(
-    output: string
+    output: string,
   ): Array<{ sha: string; author: string; commitMessage: string }> {
     const lines = output.split("\n");
     const results: Array<{

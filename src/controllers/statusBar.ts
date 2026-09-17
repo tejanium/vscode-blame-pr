@@ -12,14 +12,14 @@ export class StatusBarController {
 
   constructor(private cache: any) {
     this.statusBar = vscode.window.createStatusBarItem(
-      vscode.StatusBarAlignment.Left
+      vscode.StatusBarAlignment.Left,
     );
     this.statusBar.command = "blame-pr.open";
     this.prefetchManager = new PrefetchManager(cache);
 
     const command = vscode.commands.registerCommand(
       "blame-pr.toggleStatusbar",
-      this.toggle.bind(this)
+      this.toggle.bind(this),
     );
 
     const subscriptions: vscode.Disposable[] = [command, this.statusBar];
@@ -27,7 +27,7 @@ export class StatusBarController {
     vscode.window.onDidChangeTextEditorSelection(
       this.update,
       this,
-      subscriptions
+      subscriptions,
     );
     vscode.window.onDidChangeActiveTextEditor(this.update, this, subscriptions);
 
@@ -46,15 +46,11 @@ export class StatusBarController {
   }
 
   private get lineNumber(): number | undefined {
-    if (this.editor) {
-      return this.editor.selection.active.line + 1;
-    }
+    return this.editor ? this.editor.selection.active.line + 1 : undefined;
   }
 
   private get fileName(): string | undefined {
-    if (this.editor) {
-      return this.editor.document.fileName;
-    }
+    return this.editor?.document.fileName;
   }
 
   private get cursor(): string {
@@ -77,7 +73,7 @@ export class StatusBarController {
           this.prefetchManager.schedulePrefetch(
             this.fileName,
             this.lineNumber,
-            this.editor
+            this.editor,
           );
         }
       }
@@ -101,7 +97,7 @@ export class StatusBarController {
       const cachedBlame = git.getCachedBlame(
         this.fileName,
         this.lineNumber,
-        lineContent
+        lineContent,
       );
 
       if (cachedBlame) {
@@ -116,7 +112,7 @@ export class StatusBarController {
           const { author, commitMessage } = await git.blame(
             this.fileName,
             this.lineNumber,
-            lineContent
+            lineContent,
           );
 
           this.currentCursor = this.cursor;

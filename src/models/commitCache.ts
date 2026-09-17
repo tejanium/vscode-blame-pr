@@ -6,7 +6,7 @@ export class CommitCache {
     owner: string,
     name: string,
     sha: string,
-    fetchFn: () => Promise<string | undefined>
+    fetchFn: () => Promise<string | undefined>,
   ): Promise<string | undefined> {
     const commitKey = `${owner}:${name}:${sha}`;
 

@@ -7,7 +7,7 @@ export class Cached {
       has: (k: string) => boolean;
       get: (k: string) => any;
       put: (k: string, v: any, ttl: number) => void;
-    }
+    },
   ) {}
 
   getCached(key: string): any | undefined {

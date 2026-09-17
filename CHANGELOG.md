@@ -1,5 +1,14 @@
 # Change Log
 
+## Unreleased
+
+### Changed
+- Development toolchain now targets Node 24 and Bun; `yarn.lock` removed
+- Tests run on Vitest instead of Jest
+- ESLint 10 and Prettier added; codebase formatted
+- Minimum VS Code version raised to 1.90
+- Added GitHub Actions CI and a tag-triggered release workflow publishing to the VS Code Marketplace and Open VSX
+
 ## v1.1.0
 
 ### Added

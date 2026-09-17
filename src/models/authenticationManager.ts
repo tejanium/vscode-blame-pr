@@ -27,14 +27,14 @@ export class AuthenticationManager {
       const session = await vscode.authentication.getSession(
         "github",
         ["repo"],
-        { createIfNone: true }
+        { createIfNone: true },
       );
 
       if (session?.accessToken) {
         AuthenticationManager.cachedSession = session;
         AuthenticationManager.cachedOAuthGithub = new CachedGithub(
           this.cache,
-          session.accessToken
+          session.accessToken,
         );
         return AuthenticationManager.cachedOAuthGithub;
       }
@@ -50,7 +50,7 @@ export class AuthenticationManager {
     if (!AuthenticationManager.cachedPublicGithub) {
       AuthenticationManager.cachedPublicGithub = new CachedGithub(
         this.cache,
-        undefined
+        undefined,
       );
     }
     return AuthenticationManager.cachedPublicGithub;

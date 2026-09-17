@@ -31,7 +31,7 @@ export class FileBlameCache implements vscode.Disposable {
 
   async getBlame(
     fileName: string,
-    lineNumber: number
+    lineNumber: number,
   ): Promise<BlameInfo | undefined> {
     const normalizedPath = this.normalizePath(fileName);
 
@@ -85,7 +85,7 @@ export class FileBlameCache implements vscode.Disposable {
 
   private async refreshFileBlame(
     fileName: string,
-    lastModified: number
+    lastModified: number,
   ): Promise<void> {
     try {
       const git = new Git(dirname(fileName));

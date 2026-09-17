@@ -14,7 +14,7 @@ export class Github {
   async pullRequestID(
     owner: string,
     name: string,
-    sha: string
+    sha: string,
   ): Promise<string | undefined> {
     // Use REST API - simpler, faster, and works for all cases
     return this.pullRequestIDByCommitREST(owner, name, sha);
@@ -23,7 +23,7 @@ export class Github {
   async pullRequestIDByCommitREST(
     owner: string,
     name: string,
-    sha: string
+    sha: string,
   ): Promise<string | undefined> {
     const path = `/repos/${owner}/${name}/commits/${sha}/pulls`;
     const response = await this.rest<Array<{ number: number }>>(path);
@@ -56,7 +56,7 @@ export class Github {
       agent: Github.agent, // Reuse connections
     };
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const req = https.request(options, (res) => {
         let body = "";
 
@@ -75,7 +75,7 @@ export class Github {
           try {
             const json = JSON.parse(body);
             resolve(json as T);
-          } catch (_e) {
+          } catch {
             resolve(undefined);
           }
         });

@@ -5,7 +5,10 @@ import { FileBlameCache } from "./fileBlameCache";
 export class CachedGit extends Cached {
   private git: Git;
 
-  constructor(cache: any, private cwd: string) {
+  constructor(
+    cache: any,
+    private cwd: string,
+  ) {
     super(cache);
     this.git = new Git(cwd);
   }
@@ -21,7 +24,7 @@ export class CachedGit extends Cached {
   async blame(
     fileName: string,
     lineNumber: number,
-    lineContent?: string
+    _lineContent?: string,
   ): Promise<{ sha: string; author: string; commitMessage: string }> {
     // Use file-level blame cache that watches for file changes
     const fileBlameCache = FileBlameCache.getInstance();
@@ -38,7 +41,7 @@ export class CachedGit extends Cached {
   getCachedBlame(
     fileName: string,
     lineNumber: number,
-    lineContent?: string
+    _lineContent?: string,
   ): { sha: string; author: string; commitMessage: string } | undefined {
     // Synchronous cache check for instant status bar updates
     const fileBlameCache = FileBlameCache.getInstance();

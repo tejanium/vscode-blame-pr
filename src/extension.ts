@@ -20,7 +20,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (document.uri.scheme === "file") {
         fileBlameCache.onFileClosed(document.fileName);
       }
-    })
+    }),
   );
 
   // Initialize with currently open files
@@ -33,7 +33,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     new OpenController(cache),
     new StatusBarController(cache),
-    fileBlameCache
+    fileBlameCache,
   );
 }
 
