@@ -2,6 +2,13 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Where to publish
+        type: choice
+        default: both
+        options: [both, marketplace, openvsx]
 permissions:
   contents: write
 jobs:
@@ -17,12 +24,15 @@ jobs:
       - run: bun run test
       - run: bun run package
       - uses: softprops/action-gh-release@v3
+        if: github.event_name == 'push'
         with:
           files: "*.vsix"
           generate_release_notes: true
       - name: Publish to VS Code Marketplace
-        if: env.VSCE_PAT != ''
+        if: env.VSCE_PAT != '' && (github.event_name == 'push' || inputs.target != 'openvsx')
         run: bunx @vscode/vsce publish --no-dependencies --packagePath *.vsix
       - name: Publish to Open VSX
-        if: env.OVSX_PAT != ''
-        run: bunx ovsx publish *.vsix
+        if: env.OVSX_PAT != '' && (github.event_name == 'push' || inputs.target != 'marketplace')
+        run: |
+          bunx ovsx verify-pat tejanium || bunx ovsx create-namespace tejanium
+          bunx ovsx publish *.vsix
